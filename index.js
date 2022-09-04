@@ -5,8 +5,25 @@ config();
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-bot.start((ctx) => {
-  ctx.reply(`Hello ${ctx.from.first_name} ${ctx.from.last_name || ""}`);
+bot.on("contact", async (ctx) => {
+  try {
+    const user = await ctx.telegram.getChatMember(
+      "@nodejs_uz",
+      ctx.update.message.contact.user_id
+    );
+    if (user.status !== "member") {
+      return ctx.reply(
+        `User ${ctx.update.message.contact.first_name} left @nodejs_uz`
+      );
+    }
+    ctx.reply(
+      `User ${ctx.update.message.contact.first_name} is member of @nodejs_uz`
+    );
+  } catch (error) {
+    ctx.reply(
+      `User ${ctx.update.message.contact.first_name} is not member of @nodejs_uz`
+    );
+  }
 });
 
 bot.launch();
